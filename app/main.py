@@ -1,17 +1,14 @@
-from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
-from db import get_db, engine
-import crud, schemas, models
 
-models.Base.metadata.create_all(bind=engine)
+from fastapi import FastAPI
+from app.database import engine, Base
+from app.api.v1.api import api_router
 
-app = FastAPI()
+Base.metadata.create_all(bind=engine)
 
+app = FastAPI(title="My Application")
+
+app.include_router(api_router, prefix="/api/v1")
 
 @app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-@app.post("/users/", response_model=schemas.UserResponse)
-def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    return crud.create_user(db=db, user=user)
+def root():
+    return {"message": "Welcome to the API"}
